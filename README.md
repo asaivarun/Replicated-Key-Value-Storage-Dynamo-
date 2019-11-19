@@ -1,6 +1,5 @@
 # Replicated-Key-Value-Storage-Dynamo-
 Requirements : https://docs.google.com/document/d/1VpTvRTb7TETtN59ovdfb1FMQDRXfq6H5Toh7L7Dq1P4/edit
-
 CSE 486/586 Distributed Systems Programming Assignment 4
 Replicated Key-Value Storage
 Introduction
@@ -9,26 +8,31 @@ At this point, most of you are probably ready to understand and implement a Dyna
 The main goal is to provide both availability and linearizability at the same time. In other words, your implementation should always perform read and write operations successfully even under failures. At the same time, a read operation should always return the most recent value. To accomplish this goal, this document gives you a guideline of the implementation. However, you have freedom to come up with your own design as long as you provide availability and linearizability at the same time (that is, to the extent that the tester can test). The exception is partitioning and replication, which should be done exactly the way Dynamo does.
 
 This document assumes that you are already familiar with Dynamo. If you are not, that is your first step. There are many similarities between this assignment and the previous assignment for the most basic functionalities, and you are free to reuse your code from the previous assignment.
+
 References
 Before we discuss the requirements of this assignment, here are two references for the Dynamo design:
-Lecture slides
-Dynamo paper
+
+Lecture Slides
+Chord paper
 The lecture slides give an overview, but do not discuss Dynamo in detail, so it should be a good reference to get an overall idea. The paper presents the detail, so it should be a good reference for actual implementation.
+
 Step 0: Importing the project template
 Just like the previous assignment, we have a project template you can import to Android Studio.
+
 Download the project template zip file to a directory.
 Extract the template zip file and copy it to your Android Studio projects directory.
-Make sure that you copy the correct directory. After unzipping, the directory name should be “SimpleDynamo”, and right underneath, it should contain a number of directories and files such as “app”, “build”, “gradle”, “build.gradle”, “gradlew”, etc.
+Make sure that you copy the correct directory. After unzipping, the directory name should be “SimpleDht”, and right underneath, it should contain a number of directories and files such as “app”, “build”, “gradle”, “build.gradle”, “gradlew”, etc.
 After copying, delete the downloaded template zip file and unzipped directories and files. This is to make sure that you do not submit the template you just downloaded. (There were many people who did this before.)
 Open the project template you just copied in Android Studio.
 Use the project template for implementing all the components for this assignment.
 The template has the package name of “edu.buffalo.cse.cse486586.simpledynamo“. Please do not change this.
-The template also defines a content provider authority and class. Please use it to implement your Dynamo functionalities.
+The template also defines a content provider authority and class. Please use it to implement your Chord functionalities.
 We will use SHA-1 as our hash function to generate keys just as last time.
 The template is very minimal for this assignment. However, you can reuse any code from your previous submissions.
 You can add more to the main Activity in order to test your code. However, this is entirely optional and there is no grading component for your Activity.
 Step 1: Writing the Content Provider
-Just like the previous assignment, the content provider should implement all storage functionalities. For example, it should create server and client threads (if this is what you decide to implement), open sockets, and respond to incoming requests. When writing your system, you can make the following assumptions:
+First of all, your app should have a content provider. This content provider should implement all DHT functionalities. For example, it should create server and client threads (if this is what you decide to implement), open sockets, and respond to incoming requests. The following are the requirements for your content provider:
+
 Just like the previous assignment, you need to support insert/query/delete operations. Also, you need to support @ and * queries.
 There are always 5 nodes in the system. There is no need to implement adding/removing nodes from the system.
 However, there can be at most 1 node failure at any given time. We will emulate a failure only by force closing an app instance. We will not emulate a failure by killing an entire emulator instance.
@@ -57,11 +61,11 @@ emulator-5560: “5560”
 emulator-5562: “5562”
 Any app (not just your app) should be able to access (read and write) your content provider. As with the previous assignment, please do not include any permission to access your content provider.
 Please read the notes at the end of this document. You might run into certain problems, and the notes might give you some ideas about a couple of potential problems.
-
 The following is a guideline for your content provider based on the design of Amazon Dynamo:
+
 Membership
 Just as the original Dynamo, every node can know every other node. This means that each node knows all other nodes in the system and also knows exactly which partition belongs to which node; any node can forward a request to the correct node without using a ring-based routing.
-Request routing
+Request Routing
 Unlike Chord, each Dynamo node knows all other nodes in the system and also knows exactly which partition belongs to which node.
 Under no failures, a request for a key is directly forwarded to the coordinator (i.e., the successor of the key), and the coordinator should be in charge of serving read/write operations.
 Quorum replication
@@ -72,12 +76,12 @@ Both the reader quorum size R and the writer quorum size W should be 2.
 The coordinator for a get/put request should always contact other two nodes and get a vote from each (i.e., an acknowledgement for a write, or a value for a read).
 For write operations, all objects can be versioned in order to distinguish stale copies from the most recent copy.
 For read operations, if the readers in the reader quorum have different versions of the same object, the coordinator should pick the most recent version and return it.
-Chain replication
+Chain Replication
 Another replication strategy you can implement is chain replication, which provides linearizability.
 If you are interested in more details, please take a look at the following paper: http://www.cs.cornell.edu/home/rvr/papers/osdi04.pdf
 In chain replication, a write operation always comes to the first partition; then it propagates to the next two partitions in sequence. The last partition returns the result of the write.
 A read operation always comes to the last partition and reads the value from the last partition.
-Failure handling
+Failure Handling
 Handling failures should be done very carefully because there can be many corner cases to consider and cover.
 Just as the original Dynamo, each request can be used to detect a node failure.
 For this purpose, you can use a timeout for a socket read; you can pick a reasonable timeout value, e.g., 100 ms, and if a node does not respond within the timeout, you can consider it a failure.
@@ -85,7 +89,8 @@ Do not rely on socket creation or connect status to determine if a node has fail
 When a coordinator for a request fails and it does not respond to the request, its successor can be contacted next for the request.
 Testing
 We have testing programs to help you see how your code does with our grading criteria. There are 6 phases in testing. The first three phases will not take much time, so it’ll be better to finish them as quickly as possible. You will then be able to spend most of your time for the last three phases.
-Testing basic ops
+
+Testing Basic Ops
 This phase will test basic operations, i.e., insert, query, delete, @, and *. This will test if everything is correctly replicated. There is no concurrency in operations and there is no failure either.
 Testing concurrent ops with different keys
 This phase will test if your implementation can handle concurrent operations under no failure.
@@ -102,10 +107,10 @@ This phase will execute operations concurrently and crash one node in the middle
 Testing concurrent operations with one consistent failure
 This phase will crash one node at a time consistently, i.e., one node will crash then recover, and another node will crash and recover, etc.
 There will be a brief period of time in between the crash-recover sequence.
-
 Each testing phase is quite intensive (i.e., it will take some time for each phase to finish), so the tester allows you to specify which testing phase you want to test. You won’t have to wait until everything is finished every time. However, you still need to make sure that you run the tester in its entirety before you submit. We will not test individual testing phases separately in our grading.
+
 You can specify which testing phase you want to test by providing ‘-p’ or ‘--phase’ argument to the tester.
-Note: If you run an individual phase with "-p", it will always be a fresh install. However if you run all phases (without "-p"), it will not always be a fresh install; the grader will do a fresh-install before phase 1, and do another fresh-install before phase 2. Afterwards, there will be no install. This means that all data from previous phases will remain intact.
+Note: If you run an individual phase with "-p", it will always be a fresh install. However if you run all phases (without "-p"), it will not always be a fresh install; the grader will do a fresh-install before phase 1, and do another fresh-install before phase. Afterwards, there will be no install. This means that all data from previous phases will remain intact.
 ‘-h’ argument will show you what options are available.
 The grader uses multiple threads to test your code and each thread will independently print out its own log messages. This means that an error message might appear in the middle of the combined log messages from all threads, rather than at the end.
 Download a testing program for your platform. If your platform does not run it, please report it on Piazza.
@@ -119,17 +124,20 @@ Submission
 We use the CSE submit script. You need to use either “submit_cse486” or “submit_cse586”, depending on your registration status. If you haven’t used it, the instructions on how to use it is here: https://wiki.cse.buffalo.edu/services/content/submit-script
 
 You need to submit one file described below. Once again, you must follow everything below exactly. Otherwise, you will get no point on this assignment.
-Your entire Android Studio project source code tree zipped up in .zip: The name should be SimpleDynamo.zip.
-Never create your zip file from inside “SimpleDynamo” directory.
-Instead, make sure to zip “SimpleDynamo” directory itself. This means that you need to go to the directory that contains “SimpleDynamo” directory and zip it from there.
+
+Your entire Android Studio project source code tree zipped up in .zip: The name should be SimpleDht.zip.
+Never create your zip file from inside “SimpleDht” directory.
+Instead, make sure to zip “SimpleDht” directory itself. This means that you need to go to the directory that contains “SimpleDht” directory and zip it from there.
 Please do not use any other compression tool other than zip, i.e., no 7-Zip, no RAR, etc.
 Deadline: 5/10/2019 (Friday) 11:59am
 The deadline is firm; if your timestamp is 12pm, it is a late submission.
+
 Grading
-This assignment is 20% of your final grade. Also there is extra credit if you pass all 6 phases.
+This assignment is 10% of your final grade. The breakdown for this assignment is:
+
 Phase 1: 3%
 Phase 2: 4%
-Phase 3: 3%
+Phase 3: 4%
 Phase 4: 5%
 Phase 5: 5%
 Phase 6: 3%
