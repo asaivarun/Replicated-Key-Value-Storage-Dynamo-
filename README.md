@@ -1,11 +1,15 @@
 ﻿Designed and implemented a Dynamo-style key-value storage in android that handles Partitioning, Replication and Failure handling.
 The goal is to ensure availability and linearizability. The implementation performs concurrent read and writes to the system even under failures.At the same time, reads return the most recent writes.
 
-# Replicated-Key-Value-Storage-Dynamo-
+Code path : /src/main/java/edu/buffalo/cse/cse486586/simpledynamo/
+
+# Replicated-Key-Value-Storage-Dynamo
 Requirements : https://docs.google.com/document/d/1VpTvRTb7TETtN59ovdfb1FMQDRXfq6H5Toh7L7Dq1P4/edit
 
 CSE 486/586 Distributed Systems Programming Assignment 4
+
 Replicated Key-Value Storage
+
 Introduction
 At this point, most of you are probably ready to understand and implement a Dynamo-style key-value storage; this assignment is about implementing a simplified version of Dynamo. (And you might argue that it’s not Dynamo any more ;-) There are three main pieces you need to implement: 1) Partitioning, 2) Replication, and 3) Failure handling.
 
@@ -16,8 +20,8 @@ The main goal is to provide both availability and linearizability at the same ti
 This document assumes that you are already familiar with Dynamo. If you are not, that is your first step. There are many similarities between this assignment and the previous assignment for the most basic functionalities, and you are free to reuse your code from the previous assignment.
 References
 Before we discuss the requirements of this assignment, here are two references for the Dynamo design:
-1. Lecture slides
-2. Dynamo paper
+1. Lecture slides http://www.cse.buffalo.edu/~stevko/courses/cse486/spring19/lectures/28-dynamo.pdf
+2. Dynamo paper http://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf
 The lecture slides give an overview, but do not discuss Dynamo in detail, so it should be a good reference to get an overall idea. The paper presents the detail, so it should be a good reference for actual implementation.
 Step 0: Importing the project template
 Just like the previous assignment, we have a project template you can import to Android Studio.
