@@ -2,7 +2,7 @@
 The goal is to ensure availability and linearizability. The implementation performs concurrent read and writes to the system even under failures.At the same time, reads return the most recent writes.
 
 Code path : /src/main/java/edu/buffalo/cse/cse486586/simpledynamo/
-
+https://github.com/asaivarun/Replicated-Key-Value-Storage-Dynamo-/tree/master/src/main/java/edu/buffalo/cse/cse486586/simpledynamo
 # Replicated-Key-Value-Storage- Amazon Dynamo dB
 Requirements : https://docs.google.com/document/d/1VpTvRTb7TETtN59ovdfb1FMQDRXfq6H5Toh7L7Dq1P4/edit
 
