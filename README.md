@@ -1,5 +1,9 @@
 ﻿Designed and implemented a Dynamo-style key-value storage in android that handles Partitioning, Replication and Failure handling.
-The goal is to ensure availability and linearizability. The implementation performs concurrent read and writes to the system even under failures.At the same time, reads return the most recent writes.
+The goal is to ensure availability and linearizability. The implementation performs concurrent read and writes to the system even under failures. At the same time, reads return the most recent writes.
+
+ Durability and Availability: Partitioned and replicated the data using consistent hashing which is also used for node key distribution.
+ Reads, Writes and Failure Tolerance: Used a sloppy quorum technique together with object versioning to ensure linearizability.
+ Failure Detection and Node Recovery: Detected failed nodes and implemented a decentralized replica synchronization protocol
 
 Code path : /src/main/java/edu/buffalo/cse/cse486586/simpledynamo/
 https://github.com/asaivarun/Replicated-Key-Value-Storage-Dynamo-/tree/master/src/main/java/edu/buffalo/cse/cse486586/simpledynamo
